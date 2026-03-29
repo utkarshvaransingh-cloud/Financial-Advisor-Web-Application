@@ -1,0 +1,26 @@
+.shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  text-align: center;
+  font-family: system-ui, sans-serif;
+  color: #1a1a1a;
+  background: #f6f7f9;
+}
+
+.shell h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+.tagline {
+  margin: 0;
+  max-width: 28rem;
+  line-height: 1.5;
+  color: #444;
+  font-size: 0.95rem;
+}
