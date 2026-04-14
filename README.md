@@ -38,6 +38,8 @@ npm run dev
 
 App runs at `http://localhost:5173` (Vite default). Point the client at the API URL when integrating (proxy or `VITE_API_URL`).
 
+**Phase 1 (current):** React Router pages (login/register, dashboard, budget, reports, ITR), mock auth (`localStorage`), and in-memory finance data with sample totals, budget alerts, ghost-expense hints, and simple advice text — no backend yet.
+
 ## Project layout
 
 ```
