@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+﻿import { useMemo, useState } from 'react'
 import { useFinance } from '../context/FinanceContext.jsx'
 import { expenseCategories } from '../data/placeholder.js'
 import { formatInr } from '../utils/money.js'
@@ -9,7 +9,7 @@ import {
 } from '../utils/reports.js'
 
 export function BudgetPage() {
-  const { expenses, budgets, updateBudget } = useFinance()
+  const { expenses, budgets, updateBudget, loading, error } = useFinance()
   const key = monthKey(new Date())
   const spentBy = useMemo(
     () => sumExpensesByCategory(expenses, key),
@@ -19,13 +19,28 @@ export function BudgetPage() {
 
   const [category, setCategory] = useState(expenseCategories[0])
   const [limit, setLimit] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [formError, setFormError] = useState('')
 
-  function handleSave(e) {
+  async function handleSave(e) {
     e.preventDefault()
+    setFormError('')
+
     const n = parseFloat(limit, 10)
-    if (Number.isNaN(n) || n <= 0) return
-    updateBudget(category, n)
-    setLimit('')
+    if (Number.isNaN(n) || n <= 0) {
+      setFormError('Enter a valid monthly limit.')
+      return
+    }
+
+    setSubmitting(true)
+    try {
+      await updateBudget(category, n)
+      setLimit('')
+    } catch (err) {
+      setFormError(err.message || 'Unable to save budget')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -38,14 +53,18 @@ export function BudgetPage() {
         </p>
       </header>
 
+      {error ? <section className="callout callout--warn">{error}</section> : null}
+
       <form className="card form budget-form" onSubmit={handleSave}>
         <h3 className="card__title">Update category limit</h3>
+        {formError ? <p className="form__error">{formError}</p> : null}
         <div className="form__row form__row--inline">
           <label htmlFor="bud-cat">Category</label>
           <select
             id="bud-cat"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
+            disabled={submitting}
           >
             {expenseCategories.map((c) => (
               <option key={c} value={c}>
@@ -55,7 +74,7 @@ export function BudgetPage() {
           </select>
         </div>
         <div className="form__row form__row--inline">
-          <label htmlFor="bud-lim">Monthly limit (₹)</label>
+          <label htmlFor="bud-lim">Monthly limit (INR)</label>
           <input
             id="bud-lim"
             type="number"
@@ -64,48 +83,53 @@ export function BudgetPage() {
             value={limit}
             onChange={(e) => setLimit(e.target.value)}
             placeholder="e.g. 5000"
+            disabled={submitting}
             required
           />
         </div>
-        <button type="submit" className="btn btn--primary">
-          Save limit
+        <button type="submit" className="btn btn--primary" disabled={submitting}>
+          {submitting ? 'Saving...' : 'Save limit'}
         </button>
       </form>
 
       <section className="card">
         <h3 className="card__title">Limits vs spent (this month)</h3>
-        <div className="table-wrap">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Category</th>
-                <th>Limit</th>
-                <th>Spent</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {budgets.map((b) => {
-                const spent = spentBy[b.category] || 0
-                const over = spent > b.limit
-                return (
-                  <tr key={b.id}>
-                    <td>{b.category}</td>
-                    <td>{formatInr(b.limit)}</td>
-                    <td>{formatInr(spent)}</td>
-                    <td>
-                      {over ? (
-                        <span className="pill pill--bad">Over</span>
-                      ) : (
-                        <span className="pill pill--ok">OK</span>
-                      )}
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
+        {loading ? (
+          <p className="muted">Loading budgets...</p>
+        ) : (
+          <div className="table-wrap">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Limit</th>
+                  <th>Spent</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {budgets.map((b) => {
+                  const spent = spentBy[b.category] || 0
+                  const over = spent > b.limit
+                  return (
+                    <tr key={b.id}>
+                      <td>{b.category}</td>
+                      <td>{formatInr(b.limit)}</td>
+                      <td>{formatInr(spent)}</td>
+                      <td>
+                        {over ? (
+                          <span className="pill pill--bad">Over</span>
+                        ) : (
+                          <span className="pill pill--ok">OK</span>
+                        )}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
     </div>
   )

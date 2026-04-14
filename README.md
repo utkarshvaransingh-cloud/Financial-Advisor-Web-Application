@@ -1,57 +1,80 @@
-# Financial Advisor
+﻿# Financial Advisor
 
-MERN-stack web app for income/expense tracking, budgets, reports, ghost-expense hints, and ITR learning content.
+Full-stack personal finance app for income and expense tracking, monthly budgets, reporting, ghost-expense hints, and ITR learning content.
 
-## Tech stack
+## Stack
 
-- **Frontend:** React with [Vite](https://vite.dev/) (recommended over deprecated Create React App)
-- **Backend:** Node.js + Express
-- **Database:** MongoDB (Mongoose) — configure `MONGODB_URI` in `backend/.env`
-- **Auth:** JWT
+- Frontend: React + Vite
+- Backend: Node.js + Express
+- Database: Neon Postgres
+- Auth: JWT
+
+## Features
+
+- User registration and login backed by Postgres
+- Persistent income, expense, and budget tracking
+- Monthly dashboard and report views driven by stored data
+- Budget alerts and small-expense hints
+- Vite proxy setup for local frontend-to-backend integration
 
 ## Prerequisites
 
 - Node.js 18+
-- MongoDB (local or Atlas)
+- A Neon database connection string
 
 ## Setup
 
-### Backend
+### 1. Backend
 
 ```bash
 cd backend
 npm install
 copy .env.example .env
-# Edit .env: MONGODB_URI, JWT_SECRET, PORT
+```
+
+Set these values in `backend/.env`:
+
+- `DATABASE_URL`: your Neon connection string
+- `JWT_SECRET`: a long random secret
+- `PORT`: optional, defaults to `5000`
+- `CORS_ORIGIN`: optional, defaults to `http://localhost:5173`
+
+Then start the API:
+
+```bash
 npm run dev
 ```
 
-API runs at `http://localhost:5000` by default (see `PORT` in `.env`).
+The server creates the required tables automatically on startup.
 
-### Frontend
+### 2. Frontend
 
 ```bash
 cd frontend
 npm install
+copy .env.example .env
 npm run dev
 ```
 
-App runs at `http://localhost:5173` (Vite default). Point the client at the API URL when integrating (proxy or `VITE_API_URL`).
+By default the frontend uses `/api`, and Vite proxies that to `http://localhost:5000`.
 
-**Phase 1 (current):** React Router pages (login/register, dashboard, budget, reports, ITR), mock auth (`localStorage`), and in-memory finance data with sample totals, budget alerts, ghost-expense hints, and simple advice text — no backend yet.
+## API overview
+
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `GET /api/auth/me`
+- `GET /api/finance/bootstrap`
+- `POST /api/finance/expenses`
+- `POST /api/finance/incomes`
+- `PUT /api/finance/budgets/:category`
 
 ## Project layout
 
+```text
+frontend/   React app
+backend/    Express + Neon API
 ```
-├── frontend/          # React app
-├── backend/           # Express API
-└── .github/workflows/ # CI
-```
-
-## Roadmap
-
-Phases: setup → frontend UI → backend API → integration → tests/CI/deploy → docs/demo. See project planning doc for full checklists.
 
 ## License
 
-MIT (adjust as needed)
+MIT

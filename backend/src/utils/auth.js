@@ -10,7 +10,7 @@ function verifyAccessToken(token, jwtSecret) {
 
 function sanitizeUser(userDoc) {
   return {
-    id: String(userDoc._id),
+    id: String(userDoc.id),
     name: userDoc.name,
     email: userDoc.email,
   };

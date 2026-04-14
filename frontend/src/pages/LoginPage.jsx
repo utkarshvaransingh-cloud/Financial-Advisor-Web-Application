@@ -1,9 +1,9 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 
 export function LoginPage() {
-  const { isAuthenticated, login } = useAuth()
+  const { isAuthenticated, login, authReady } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const from = location.state?.from?.pathname || '/dashboard'
@@ -11,20 +11,35 @@ export function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
-  if (isAuthenticated) {
+  if (authReady && isAuthenticated) {
     return <Navigate to={from} replace />
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
     setError('')
+
     if (!email.trim()) {
       setError('Enter your email.')
       return
     }
-    login(email.trim())
-    navigate(from, { replace: true })
+
+    if (!password.trim()) {
+      setError('Enter your password.')
+      return
+    }
+
+    setSubmitting(true)
+    try {
+      await login(email.trim(), password)
+      navigate(from, { replace: true })
+    } catch (err) {
+      setError(err.message || 'Unable to sign in')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -32,8 +47,7 @@ export function LoginPage() {
       <div className="auth-card card">
         <h1 className="auth-card__title">Sign in</h1>
         <p className="auth-card__hint">
-          Phase 1 demo: any email/password works. Data stays in this browser
-          session.
+          Sign in to sync your financial data with the backend database.
         </p>
         <form className="form" onSubmit={handleSubmit}>
           {error ? <p className="form__error">{error}</p> : null}
@@ -45,6 +59,7 @@ export function LoginPage() {
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={submitting}
               required
             />
           </div>
@@ -56,10 +71,16 @@ export function LoginPage() {
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={submitting}
+              required
             />
           </div>
-          <button type="submit" className="btn btn--primary btn--block">
-            Sign in
+          <button
+            type="submit"
+            className="btn btn--primary btn--block"
+            disabled={submitting}
+          >
+            {submitting ? 'Signing in...' : 'Sign in'}
           </button>
         </form>
         <p className="auth-card__footer">

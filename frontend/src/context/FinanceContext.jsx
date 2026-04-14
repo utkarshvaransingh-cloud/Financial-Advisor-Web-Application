@@ -3,73 +3,115 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from 'react'
-import {
-  initialBudgets,
-  initialExpenses,
-  initialIncomes,
-} from '../data/placeholder.js'
+import { useAuth } from './AuthContext.jsx'
+import { apiRequest } from '../utils/api.js'
 
 const FinanceContext = createContext(null)
 
-function newId() {
-  return crypto.randomUUID()
-}
-
 export function FinanceProvider({ children }) {
-  const [expenses, setExpenses] = useState(initialExpenses)
-  const [incomes, setIncomes] = useState(initialIncomes)
-  const [budgets, setBudgets] = useState(initialBudgets)
+  const { token, isAuthenticated, authReady } = useAuth()
+  const [expenses, setExpenses] = useState([])
+  const [incomes, setIncomes] = useState([])
+  const [budgets, setBudgets] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
-  const addExpense = useCallback((payload) => {
-    setExpenses((prev) => [
-      ...prev,
-      {
-        id: newId(),
-        amount: payload.amount,
-        category: payload.category,
-        note: payload.note || '',
-        date: payload.date instanceof Date ? payload.date : new Date(payload.date),
-      },
-    ])
-  }, [])
+  useEffect(() => {
+    let cancelled = false
 
-  const addIncome = useCallback((payload) => {
-    setIncomes((prev) => [
-      ...prev,
-      {
-        id: newId(),
-        amount: payload.amount,
-        source: payload.source,
-        date: payload.date instanceof Date ? payload.date : new Date(payload.date),
-      },
-    ])
-  }, [])
+    async function loadFinance() {
+      if (!authReady) return
+      if (!isAuthenticated || !token) {
+        setExpenses([])
+        setIncomes([])
+        setBudgets([])
+        setLoading(false)
+        setError('')
+        return
+      }
 
-  const updateBudget = useCallback((category, limit) => {
+      setLoading(true)
+      setError('')
+
+      try {
+        const data = await apiRequest('/finance/bootstrap', { token })
+        if (!cancelled) {
+          setExpenses(data.expenses || [])
+          setIncomes(data.incomes || [])
+          setBudgets(data.budgets || [])
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err.message || 'Failed to load finance data')
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false)
+        }
+      }
+    }
+
+    loadFinance()
+
+    return () => {
+      cancelled = true
+    }
+  }, [authReady, isAuthenticated, token])
+
+  const addExpense = useCallback(async (payload) => {
+    const data = await apiRequest('/finance/expenses', {
+      method: 'POST',
+      token,
+      body: payload,
+    })
+    setExpenses((prev) => [data.expense, ...prev])
+    return data.expense
+  }, [token])
+
+  const addIncome = useCallback(async (payload) => {
+    const data = await apiRequest('/finance/incomes', {
+      method: 'POST',
+      token,
+      body: payload,
+    })
+    setIncomes((prev) => [data.income, ...prev])
+    return data.income
+  }, [token])
+
+  const updateBudget = useCallback(async (category, limit) => {
+    const data = await apiRequest(`/finance/budgets/${encodeURIComponent(category)}`, {
+      method: 'PUT',
+      token,
+      body: { category, limit },
+    })
     setBudgets((prev) => {
       const idx = prev.findIndex((b) => b.category === category)
       if (idx >= 0) {
         const next = [...prev]
-        next[idx] = { ...next[idx], limit }
+        next[idx] = data.budget
         return next
       }
-      return [...prev, { id: newId(), category, limit }]
+      return [...prev, data.budget].sort((a, b) => a.category.localeCompare(b.category))
     })
-  }, [])
+    return data.budget
+  }, [token])
 
   const value = useMemo(
     () => ({
       expenses,
       incomes,
       budgets,
+      loading,
+      error,
       addExpense,
       addIncome,
       updateBudget,
     }),
-    [expenses, incomes, budgets, addExpense, addIncome, updateBudget],
+    [expenses, incomes, budgets, loading, error, addExpense, addIncome, updateBudget],
   )
 
   return (

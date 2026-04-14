@@ -1,4 +1,4 @@
-import { ExpenseForm } from '../components/ExpenseForm.jsx'
+﻿import { ExpenseForm } from '../components/ExpenseForm.jsx'
 import { IncomeForm } from '../components/IncomeForm.jsx'
 import { useFinance } from '../context/FinanceContext.jsx'
 import { formatInr } from '../utils/money.js'
@@ -12,7 +12,8 @@ import {
 } from '../utils/reports.js'
 
 export function DashboardPage() {
-  const { expenses, incomes, budgets, addExpense, addIncome } = useFinance()
+  const { expenses, incomes, budgets, addExpense, addIncome, loading, error } =
+    useFinance()
   const now = new Date()
   const key = monthKey(now)
   const incomeTotal = totalIncomeInMonth(incomes, key)
@@ -32,6 +33,8 @@ export function DashboardPage() {
         <h1 className="page__title">Dashboard</h1>
         <p className="page__subtitle">This month at a glance</p>
       </header>
+
+      {error ? <section className="callout callout--warn">{error}</section> : null}
 
       <section className="stats" aria-label="Summary">
         <div className="stat card">
@@ -67,7 +70,7 @@ export function DashboardPage() {
           <ul>
             {ghosts.map((g) => (
               <li key={g.id}>
-                {formatInr(g.amount)} — {g.category}
+                {formatInr(g.amount)} - {g.category}
                 {g.note ? ` (${g.note})` : ''}
               </li>
             ))}
@@ -75,29 +78,37 @@ export function DashboardPage() {
         </section>
       ) : null}
 
-      <div className="dashboard__grid">
-        <ExpenseForm onAdd={addExpense} />
-        <IncomeForm onAdd={addIncome} />
-      </div>
+      {loading ? (
+        <section className="card">
+          <p className="muted">Loading your dashboard...</p>
+        </section>
+      ) : (
+        <>
+          <div className="dashboard__grid">
+            <ExpenseForm onAdd={addExpense} />
+            <IncomeForm onAdd={addIncome} />
+          </div>
 
-      <section className="card">
-        <h3 className="card__title">Recent expenses</h3>
-        {recent.length === 0 ? (
-          <p className="muted">No expenses yet.</p>
-        ) : (
-          <ul className="list-plain">
-            {recent.map((e) => (
-              <li key={e.id} className="list-plain__row">
-                <span>{formatInr(e.amount)}</span>
-                <span>{e.category}</span>
-                <span className="muted">
-                  {new Date(e.date).toLocaleDateString('en-IN')}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+          <section className="card">
+            <h3 className="card__title">Recent expenses</h3>
+            {recent.length === 0 ? (
+              <p className="muted">No expenses yet.</p>
+            ) : (
+              <ul className="list-plain">
+                {recent.map((e) => (
+                  <li key={e.id} className="list-plain__row">
+                    <span>{formatInr(e.amount)}</span>
+                    <span>{e.category}</span>
+                    <span className="muted">
+                      {new Date(e.date).toLocaleDateString('en-IN')}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </>
+      )}
     </div>
   )
 }

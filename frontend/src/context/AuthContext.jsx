@@ -3,53 +3,90 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from 'react'
-
-const STORAGE_KEY = 'fa_user'
+import { apiRequest, clearStoredAuth, getStoredAuth, storeAuth } from '../utils/api.js'
 
 const AuthContext = createContext(null)
 
-function readStoredUser() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return null
-    return JSON.parse(raw)
-  } catch {
-    return null
-  }
-}
-
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => readStoredUser())
+  const [auth, setAuth] = useState(() => getStoredAuth())
+  const [authReady, setAuthReady] = useState(false)
 
-  const login = useCallback((email) => {
-    const next = { email, name: email.split('@')[0] || 'User' }
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
-    setUser(next)
+  const persistAuth = useCallback((next) => {
+    storeAuth(next)
+    setAuth(next)
   }, [])
 
-  const register = useCallback((name, email) => {
-    const next = { email, name: name.trim() || 'User' }
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
-    setUser(next)
-  }, [])
+  useEffect(() => {
+    let cancelled = false
+
+    async function restoreSession() {
+      if (!auth?.token) {
+        setAuthReady(true)
+        return
+      }
+
+      try {
+        const data = await apiRequest('/auth/me', { token: auth.token })
+        if (!cancelled) {
+          persistAuth({ token: auth.token, user: data.user })
+        }
+      } catch {
+        if (!cancelled) {
+          clearStoredAuth()
+          setAuth(null)
+        }
+      } finally {
+        if (!cancelled) {
+          setAuthReady(true)
+        }
+      }
+    }
+
+    restoreSession()
+
+    return () => {
+      cancelled = true
+    }
+  }, [auth?.token, persistAuth])
+
+  const login = useCallback(async (email, password) => {
+    const data = await apiRequest('/auth/login', {
+      method: 'POST',
+      body: { email, password },
+    })
+    persistAuth(data)
+    return data.user
+  }, [persistAuth])
+
+  const register = useCallback(async (name, email, password) => {
+    const data = await apiRequest('/auth/register', {
+      method: 'POST',
+      body: { name, email, password },
+    })
+    persistAuth(data)
+    return data.user
+  }, [persistAuth])
 
   const logout = useCallback(() => {
-    localStorage.removeItem(STORAGE_KEY)
-    setUser(null)
+    clearStoredAuth()
+    setAuth(null)
   }, [])
 
   const value = useMemo(
     () => ({
-      user,
-      isAuthenticated: Boolean(user),
+      user: auth?.user ?? null,
+      token: auth?.token ?? null,
+      authReady,
+      isAuthenticated: Boolean(auth?.token && auth?.user),
       login,
       register,
       logout,
     }),
-    [user, login, register, logout],
+    [auth, authReady, login, register, logout],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
