@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 
 const { getConfig } = require('./config/env');
 const { connectToDatabase } = require('./config/db');
+const authRoutes = require('./routes/auth');
 
 const app = express();
 const config = getConfig();
@@ -22,6 +23,12 @@ app.get('/api/health', (req, res) => {
       readyState: mongoose.connection?.readyState ?? 0,
     },
   });
+});
+
+app.use('/api/auth', authRoutes);
+
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not found' });
 });
 
 async function start() {
