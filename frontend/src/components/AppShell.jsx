@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router-dom'
+import { AiChatbot } from './AiChatbot.jsx'
 import { AppNav } from './AppNav.jsx'
 
 export function AppShell() {
@@ -8,6 +9,7 @@ export function AppShell() {
       <main className="app-main">
         <Outlet />
       </main>
+      <AiChatbot />
     </div>
   )
 }

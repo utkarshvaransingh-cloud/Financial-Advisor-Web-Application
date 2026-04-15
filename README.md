@@ -36,6 +36,8 @@ Set these values in `backend/.env`:
 
 - `DATABASE_URL`: your Neon connection string
 - `JWT_SECRET`: a long random secret
+- `GEMINI_API_KEY`: your Google Gemini API key for the AI assistant
+- `GEMINI_MODEL`: optional, defaults to `gemini-1.5-flash`
 - `PORT`: optional, defaults to `5000`
 - `CORS_ORIGIN`: optional, defaults to `http://localhost:5173`
 

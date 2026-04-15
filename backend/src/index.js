@@ -5,6 +5,7 @@ const cors = require('cors');
 const { getConfig } = require('./config/env');
 const { connectToDatabase, initSchema } = require('./config/db');
 const authRoutes = require('./routes/auth');
+const chatRoutes = require('./routes/chat');
 const financeRoutes = require('./routes/finance');
 
 const app = express();
@@ -27,6 +28,7 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/chat', chatRoutes);
 app.use('/api/finance', financeRoutes);
 
 app.use((err, req, res, next) => {
