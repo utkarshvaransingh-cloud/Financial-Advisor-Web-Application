@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
+import { ThemeToggle } from './ThemeToggle.jsx'
 
 const links = [
   { to: '/dashboard', label: 'Dashboard' },
@@ -32,6 +33,7 @@ export function AppNav() {
         ))}
       </nav>
       <div className="app-nav__user">
+        <ThemeToggle />
         <span className="app-nav__name">{user?.name}</span>
         <button type="button" className="app-nav__logout" onClick={logout}>
           Log out

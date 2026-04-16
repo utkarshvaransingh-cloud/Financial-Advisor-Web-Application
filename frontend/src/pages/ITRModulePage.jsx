@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { NewsCarousel } from '../components/NewsCarousel.jsx';
 
 export function ITRModulePage() {
   const [activeFaq, setActiveFaq] = useState(null);
@@ -15,9 +16,9 @@ export function ITRModulePage() {
         <p className="page__subtitle">
           Complete guide for individuals to declare income, claim refunds, and stay compliant.
         </p>
-        <div className="hero-cta">
+        {/* <div className="hero-cta">
           <button className="btn btn--primary">Start Filing Now</button>
-        </div>
+        </div> */}
       </header>
 
       <article className="prose card">
@@ -108,6 +109,12 @@ export function ITRModulePage() {
           </div>
         </section>
       </article>
+
+      <NewsCarousel
+        topic="tax"
+        title="Taxation and ITR headlines"
+        subtitle="Updates on income tax, deductions, filing rules, refunds, and compliance."
+      />
 
       {/* 5. Chatbot Widget */}
       <div className="chatbot-trigger">

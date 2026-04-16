@@ -1,4 +1,5 @@
 ﻿import { useMemo, useState } from 'react'
+import { NewsCarousel } from '../components/NewsCarousel.jsx'
 import { useFinance } from '../context/FinanceContext.jsx'
 import { expenseCategories } from '../data/placeholder.js'
 import { formatInr } from '../utils/money.js'
@@ -131,6 +132,12 @@ export function BudgetPage() {
           </div>
         )}
       </section>
+
+      <NewsCarousel
+        topic="budget"
+        title="Finance and budget headlines"
+        subtitle="Fresh updates on personal finance, budgeting, markets, and economic planning."
+      />
     </div>
   )
 }

@@ -14,6 +14,7 @@ function getConfig() {
     corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:5173',
     geminiApiKey: process.env.GEMINI_API_KEY || '',
     geminiModel: process.env.GEMINI_MODEL || 'gemini-1.5-flash',
+    newsApiKey: process.env.NEWS_API_KEY || '',
     nodeEnv: process.env.NODE_ENV || 'development',
   };
 }
