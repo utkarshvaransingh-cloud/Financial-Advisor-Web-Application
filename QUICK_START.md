@@ -1,165 +1,86 @@
 # 🚀 Quick Start - Running Commands
 
-## ⚡ Fast Setup & Run
+## ⚡ Essential Setup
 
-### **Backend Setup & Run**
+### **Prerequisites**
+- Node.js 18+
+- PostgreSQL/Neon database connection string
+- Google Gemini API key
+
+### **Terminal 1: Backend**
 ```bash
 cd backend
 npm install
 copy .env.example .env
+# Add to backend/.env:
+# DATABASE_URL, JWT_SECRET, GEMINI_API_KEY
 npm run dev
+# Runs on http://localhost:5000
 ```
 
-### **Frontend Setup & Run**
+### **Terminal 2: Frontend**
 ```bash
 cd frontend
 npm install
 copy .env.example .env
 npm run dev
+# Runs on http://localhost:5173
 ```
 
 ---
 
-## 🌐 Access the Application
+## 🌐 Access Application
 - **Frontend**: [http://localhost:5173](http://localhost:5173)
 - **Backend API**: [http://localhost:5000](http://localhost:5000)
 
 ---
 
-## 📋 All Available Commands
+## 📋 Essential Commands
 
-### **Backend Commands**
+### Backend
 ```bash
-# Development server with auto-reload
-npm run dev
-
-# Production server
-npm start
-
-# Install dependencies
-npm install
-
-# View installed packages
-npm list
+npm run dev      # Development (auto-reload)
+npm start        # Production
+npm install      # Install dependencies
 ```
 
-### **Frontend Commands**
+### Frontend
 ```bash
-# Development server (Vite)
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
-
-# Lint code with ESLint
-npm lint
-
-# Install dependencies
-npm install
+npm run dev      # Development
+npm run build    # Production build
+npm install      # Install dependencies
 ```
 
 ---
 
-## 🎯 Complete Parallel Setup
-
-**Open Terminal 1 - Backend:**
-```bash
-cd backend
-npm install
-npm run dev
-```
-
-**Open Terminal 2 - Frontend (while backend runs):**
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Both servers will run simultaneously on different ports.
-
----
-
-## 📝 Environment Configuration
+## 📝 Required Environment Variables
 
 ### **Backend (.env)**
 ```
-DATABASE_URL=your_neon_postgres_connection_string
-JWT_SECRET=your_long_random_secret_key
-GEMINI_API_KEY=your_google_gemini_api_key
-GEMINI_MODEL=gemini-1.5-flash
+DATABASE_URL=postgresql://...
+JWT_SECRET=your_secret_key_here
+GEMINI_API_KEY=your_gemini_api_key
 PORT=5000
 CORS_ORIGIN=http://localhost:5173
 ```
 
-### **Frontend (.env)**
+---
+
+## ✅ Verify Setup
+
+**Backend:**
 ```
-VITE_API_URL=http://localhost:5000
+✓ Server running on http://localhost:5000
+✓ Database connected
+✓ Tables created
+```
+
+**Frontend:**
+```
+✓ Development server at http://localhost:5173
+✓ Connected to backend API
 ```
 
 ---
 
-## 🔗 API Testing Commands
-
-### **Using cURL - Register User**
-```bash
-curl -X POST http://localhost:5000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"email":"user@example.com","password":"password123"}'
-```
-
-### **Using cURL - Login**
-```bash
-curl -X POST http://localhost:5000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"user@example.com","password":"password123"}'
-```
-
----
-
-## 🐛 Quick Troubleshooting
-
-### **Port 5000 Already in Use**
-```bash
-# Kill process on port 5000
-netstat -ano | findstr :5000
-taskkill /PID <PID> /F
-
-# Or run on different port
-PORT=3001 npm run dev
-```
-
-### **Clear Node Modules & Reinstall**
-```bash
-rm -r node_modules package-lock.json
-npm install
-```
-
-### **Clear npm Cache**
-```bash
-npm cache clean --force
-```
-
----
-
-## ✅ Success Indicators
-
-**Backend Running:**
-```
-Server is running on http://localhost:5000
-Database connection established
-Tables created automatically
-```
-
-**Frontend Running:**
-```
-➜ Local: http://localhost:5173/
-➜ Press 'q' to quit
-```
-
----
-
-**For detailed setup guide, see:** [PROJECT_SETUP_GUIDE.md](PROJECT_SETUP_GUIDE.md)
+**For complete guide:** [PROJECT_SETUP_GUIDE.md](PROJECT_SETUP_GUIDE.md)
