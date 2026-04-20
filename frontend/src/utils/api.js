@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://financial-advisor-web-app.netlify.app'
 
 export function getStoredAuth() {
   try {

@@ -11,7 +11,9 @@ function getConfig() {
     port: Number(process.env.PORT || 5000),
     databaseUrl: requireEnv('DATABASE_URL'),
     jwtSecret: requireEnv('JWT_SECRET'),
-    corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+    corsOrigin: process.env.CORS_ORIGIN || (process.env.NODE_ENV === 'production'
+      ? 'https://financial-advisor-web-app.vercel.app,https://financial-advisor-web-app.netlify.app'
+      : 'http://localhost:5173'),
     geminiApiKey: process.env.GEMINI_API_KEY || '',
     geminiModel: process.env.GEMINI_MODEL || 'gemini-1.5-flash',
     newsApiKey: process.env.NEWS_API_KEY || '',

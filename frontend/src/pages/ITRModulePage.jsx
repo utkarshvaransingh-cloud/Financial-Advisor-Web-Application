@@ -127,7 +127,7 @@ export function ITRModulePage() {
 
       <style jsx>{`
         .hero-gradient {
-          background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+          background: linear-gradient(135deg, #001351 0%, #64a0ff 100%);
           color: white;
           padding: 3rem 1.5rem;
           border-radius: 0 0 1rem 1rem;
@@ -140,10 +140,10 @@ export function ITRModulePage() {
           margin: 2rem 0;
         }
         .feature-card {
-          background: #f8fafc;
+          background: linear-gradient(135deg, #001351 0%, #64a0ff 100%);
           padding: 1.5rem;
           border-radius: 0.75rem;
-          border: 1px solid #e2e8f0;
+          border: 1px solid #156cdd;
         }
         .stepper {
           display: flex;
@@ -179,7 +179,7 @@ export function ITRModulePage() {
         }
         .accordion-body {
           padding-top: 0.5rem;
-          color: #64748b;
+          color: #edf8ff;
         }
         .chatbot-trigger {
           position: fixed;
